@@ -1,0 +1,33 @@
+digraph TwoBlockers {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Why apt-get can't fix a missing tool at runtime — two stacked blockers";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  goal [fillcolor="#1a1f26", color="#556070", label="Agent tries:\napt-get install -y graphviz"];
+
+  b1 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+      label="BLOCKER 1: runtime user is UID 1000\n(docker_run_as_host_user: true)\nCapEff = 0000000000000000\n\nCHOWN/DAC_OVERRIDE/FOWNER only sit in\nthe BOUNDING set — inert for non-root.\napt-get update fails immediately:\n\"Permission denied\" on /var/lib/apt/lists"];
+
+  escalate [fillcolor="#152a3a", color="#39d0ff", label="Manually escalate to root\n(docker exec -u 0:0 — the AGENT\ncan never do this itself)"];
+
+  b2 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+      label="BLOCKER 2: apt's HTTP method drops\nprivilege to Debian's _apt sandbox user\n(seteuid/setgroups) — needs\nCAP_SETUID/CAP_SETGID, deliberately\nnot in the added-back set.\n\"Method http has died unexpectedly\""];
+
+  dead [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+        label="No package index ever downloads.\nEven root can't install anything."];
+
+  conclusion [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+              label="No config flag fixes this at runtime.\nLoosening it means undoing the\nhardening from the rm -rf incident."];
+
+  goal -> b1;
+  b1 -> escalate [label="try anyway"];
+  escalate -> b2;
+  b2 -> dead;
+  dead -> conclusion;
+}

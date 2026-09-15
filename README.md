@@ -211,6 +211,74 @@ double-book whatever large model the user just switched away from), and move mem
 Qdrant to a real Qdrant *server* process, which supports concurrent clients. See
 [`.../06_recommended_fixes`](diagrams/13_addendum_mem0_contention/06_recommended_fixes.svg).
 
+## Addendum: installing system packages in the sandbox (Graphviz worked example)
+
+Once the Docker sandbox is locked down, an obvious next question is: what happens when the agent
+needs a system tool that isn't in the base image? Concretely: `dot`/Graphviz was missing from the
+sandbox used to render this repo's own diagrams. `apt-get install` inside the running container
+turns out to be blocked by **two independent, stacked reasons** — not one config flag away from
+working:
+
+**Blocker 1 — the runtime user has an empty effective capability set.** The sandbox runs as
+`--cap-drop ALL --cap-add CAP_CHOWN --cap-add CAP_DAC_OVERRIDE --cap-add CAP_FOWNER --user
+1000:1000` (non-root, so bind-mounted files stay owned by the real host user). Checked directly:
+```
+$ docker exec -u 1000:1000 <container> grep Cap /proc/self/status
+CapEff: 0000000000000000      <-- nothing, in practice
+CapBnd: 000000000000000b      <-- the three added caps are only in the BOUNDING set
+```
+Linux capabilities only become *effective* for a non-root process if explicitly raised into the
+**ambient** set — sitting in the bounding set alone (what `--cap-add` gives a `--user`-non-root
+container) is inert. `apt-get update` fails immediately: `Permission denied` on `/var/lib/apt/lists`.
+
+**Blocker 2 — even as root, `apt-get` itself needs a capability that was deliberately dropped.**
+Escalating manually via `docker exec -u 0:0` (something the agent itself can never do) does raise
+`CapEff` to the bounding set. But `apt-get`'s HTTP downloader drops privilege to Debian's
+dedicated `_apt` sandbox user via `seteuid`/`setgroups` — which need `CAP_SETUID`/`CAP_SETGID`,
+not in the added-back set:
+```
+E: seteuid 42 failed - seteuid (1: Operation not permitted)
+E: Method http has died unexpectedly!
+```
+No package index ever downloads, so even `apt-get install graphviz` as root then fails outright.
+**There is no config flag that makes ad-hoc `apt-get install` work under this hardening** — not
+for the agent, not even manually as root — without adding back exactly the capabilities that were
+dropped on purpose. See
+[`diagrams/14_addendum_sandbox_package_installs/01_two_blockers`](diagrams/14_addendum_sandbox_package_installs/01_two_blockers.svg).
+
+**The fix: bake it in at build time, where root is real and unconstrained.** `dot` itself needs
+*zero* runtime privilege — it only reads/writes files the agent already has access to. This repo's
+own [`docker/hermes-sandbox-graphviz/Dockerfile`](docker/hermes-sandbox-graphviz/Dockerfile):
+```dockerfile
+FROM nikolaik/python-nodejs:python3.11-nodejs20
+USER root
+RUN apt-get install -y --no-install-recommends graphviz && rm -rf /var/lib/apt/lists/*
+USER pn
+```
+Built, pointed `terminal.docker_image` at the resulting `hermes-sandbox:graphviz` tag, and
+verified with a **real Hermes-driven command** (not just a manual `docker run`):
+```
+$ hermes -z "run: which dot && dot -V" --provider custom
+dot at /usr/bin/dot, version 2.42.4.
+```
+`docker inspect` on the freshly created container confirmed the image swap changed nothing about
+the hardening: `CapDrop=[ALL]`, `User=1000:1000`, `no-new-privileges`, and the mount list still
+only `hermes-sessions/ → /workspace` (rw). See
+[`.../02_buildtime_vs_runtime_privilege`](diagrams/14_addendum_sandbox_package_installs/02_buildtime_vs_runtime_privilege.svg)
+and
+[`.../04_verification_evidence`](diagrams/14_addendum_sandbox_package_installs/04_verification_evidence.svg).
+
+**The general policy, properly framed:** the right model isn't "let the agent `apt-get` with
+approval" — it's that package installation stays a build-time, human-only action; the running
+sandbox never gets that power, at any capability level. Three tiers: `npx`/`uvx` for npm/PyPI
+tools (no root needed, covers most cases); a derived image for anything needed reliably (the
+*default* — the gate is simply "requires a human with host shell access," stronger than any
+in-sandbox approval prompt); and, not recommended, occasional ad-hoc installs with root +
+`CAP_SETUID`/`CAP_SETGID` re-added, gated by the same `approvals` layer every other terminal
+command already goes through — a deliberate, manually-toggled trade-off, never the standing
+default. See
+[`.../03_tiered_policy`](diagrams/14_addendum_sandbox_package_installs/03_tiered_policy.svg).
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -252,6 +320,12 @@ diagrams/
     04_qdrant_single_writer_collision.{dot,svg,png}
     05_recurrence_history.{dot,svg,png}
     06_recommended_fixes.{dot,svg,png}
+  14_addendum_sandbox_package_installs/
+    01_two_blockers.{dot,svg,png}
+    02_buildtime_vs_runtime_privilege.{dot,svg,png}
+    03_tiered_policy.{dot,svg,png}
+    04_verification_evidence.{dot,svg,png}
+docker/hermes-sandbox-graphviz/Dockerfile   # the validated derived-image recipe (Graphviz example)
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```
 

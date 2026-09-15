@@ -1,0 +1,32 @@
+digraph TieredPolicy {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="\"Permission-gated system installs\" — properly framed";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  need [shape=diamond, fillcolor="#152a3a", color="#39d0ff", label="Agent needs a new tool"];
+
+  t1q [shape=diamond, fillcolor="#152a3a", color="#39d0ff", label="Available via npm/PyPI?"];
+  t1 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+      label="TIER 1: npx / uvx\nNo root needed at all.\nCovers most tool needs."];
+
+  t2q [shape=diamond, fillcolor="#152a3a", color="#39d0ff", label="Needed reliably,\nevery session?"];
+  t2 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+      label="TIER 2 (DEFAULT): build a derived image\n(human edits Dockerfile, docker build,\npoint terminal.docker_image at it)\nThe gate = \"requires a human with\nhost shell access\" — the strongest\ngate available."];
+
+  t3q [shape=diamond, fillcolor="#152a3a", color="#39d0ff", label="Truly one-off,\nrebuild not worth it?"];
+  t3 [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+      label="TIER 3 (NOT DEFAULT): root + CAP_SETUID/\nCAP_SETGID, gated by Hermes's existing\napprovals (smart/manual) like any other\nterminal command — but undoes real\nhardening. Deliberate, occasional,\nmanually toggled only."];
+
+  need -> t1q;
+  t1q -> t1 [label="yes"];
+  t1q -> t2q [label="no"];
+  t2q -> t2 [label="yes"];
+  t2q -> t3q [label="no"];
+  t3q -> t3 [label="yes, accepted\ntrade-off"];
+}

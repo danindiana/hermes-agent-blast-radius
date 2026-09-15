@@ -1,0 +1,36 @@
+digraph BuildtimeVsRuntime {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Where root actually exists: build time only, never runtime";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#39ffb0", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  subgraph cluster_build {
+    label="docker build  (human, host shell, one-time)";
+    fontcolor="#39ffb0";
+    color="#39ffb0";
+    style=dashed;
+    bgcolor="#0d1f18";
+    df [fillcolor="#0f2a20", color="#39ffb0", shape=note, label="Dockerfile:\nUSER root\nRUN apt-get install -y graphviz\nUSER pn"];
+    fullroot [fillcolor="#0f2a20", color="#39ffb0", label="Real, unconstrained root —\nno cap-drop, no _apt sandbox\nuser restriction, no UID remap"];
+    image [shape=cylinder, fillcolor="#152a3a", color="#39d0ff", penwidth=2.5, label="hermes-sandbox:graphviz\n(baked-in binary, root never\nneeded again)"];
+  }
+
+  subgraph cluster_run {
+    label="running sandbox container  (agent, every turn)";
+    fontcolor="#ff4d4d";
+    color="#ff4d4d";
+    style=dashed;
+    bgcolor="#150d0d";
+    ctr [fillcolor="#1a1f26", color="#556070", label="--cap-drop ALL\n--user 1000:1000\nCapEff always 0000000000000000"];
+    dot [fillcolor="#0f2a20", color="#39ffb0", label="dot runs fine —\nneeds ZERO runtime privilege,\nonly reads/writes files the\nagent already has access to"];
+  }
+
+  df -> fullroot -> image;
+  image -> ctr [label="terminal.docker_image"];
+  ctr -> dot;
+}

@@ -1,0 +1,29 @@
+digraph VerificationEvidence {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Verified live — real Hermes command, real container inspection";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  build [fillcolor="#0f2a20", color="#39ffb0", label="docker build -t hermes-sandbox:graphviz\nSuccessfully built + tagged"];
+  cfg [fillcolor="#0f2a20", color="#39ffb0", label="terminal.docker_image:\n\"hermes-sandbox:graphviz\"\n(hermes config get confirms it)"];
+  rm [fillcolor="#152a3a", color="#39d0ff", label="docker rm -f <old container>\nforces recreation on next use"];
+  run [fillcolor="#152a3a", color="#39d0ff", penwidth=2.5,
+       label="hermes -z \"run: which dot && dot -V\"\n(fresh one-shot process,\nreal Hermes-driven command)"];
+  out [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+       label="dot at /usr/bin/dot, version 2.42.4"];
+  inspect [fillcolor="#152a3a", color="#39d0ff", label="docker inspect <new container>"];
+  ev1 [fillcolor="#0f2a20", color="#39ffb0", label="Image = hermes-sandbox:graphviz"];
+  ev2 [fillcolor="#0f2a20", color="#39ffb0", label="CapDrop=[ALL], User=1000:1000,\nno-new-privileges, PidsLimit=256\n(unchanged from before the image swap)"];
+  ev3 [fillcolor="#0f2a20", color="#39ffb0", label="Mounts: still ONLY\nhermes-sessions/ -> /workspace (rw)"];
+
+  build -> cfg -> rm -> run -> out;
+  run -> inspect;
+  inspect -> ev1;
+  inspect -> ev2;
+  inspect -> ev3;
+}
