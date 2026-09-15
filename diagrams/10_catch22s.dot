@@ -1,0 +1,41 @@
+digraph Catch22s {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Catch-22s of sandboxing an agent's own filesystem access";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica", style=dashed];
+
+  c1a [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="Mount more paths\n→ agent can do more useful work"];
+  c1b [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+       label="→ also more that a bad\ncommand can destroy"];
+  c1a -> c1b [label="tension"];
+
+  c2a [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="Container $HOME (/root) lets the\nagent keep its own scratch state"];
+  c2b [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+       label="→ agent writes deliverables there\ninstead of /workspace — output\nends up hidden from the user\n(see the empty report.md incident)"];
+  c2a -> c2b [label="tension"];
+
+  c3a [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="checkpoints.enabled catches\nrm/mv/git-clean before they run"];
+  c3b [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+       label="→ off by default (storage cost) —\nyou must opt in BEFORE the incident,\nnot after"];
+  c3a -> c3b [label="tension"];
+
+  c4a [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="smart-approval reduces prompt\nfatigue for genuinely safe commands"];
+  c4b [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+       label="→ the same LLM judgment that\nreduces fatigue is what\nself-approved this rm -rf"];
+  c4a -> c4b [label="tension"];
+
+  c5a [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="ext4 + a live, mounted root fs\nis normal and expected"];
+  c5b [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+       label="→ is also exactly what makes\npost-hoc recovery tools\n(extundelete) refuse to run"];
+  c5a -> c5b [label="tension"];
+}

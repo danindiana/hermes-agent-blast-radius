@@ -1,0 +1,49 @@
+digraph ArchitectureAfter {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Architecture AFTER the fix — terminal.backend: docker";
+  labelloc="t";
+  fontsize=22;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", color="#556070", penwidth=1.5];
+  edge [color="#39ffb0", fontcolor="#ffa93a", fontname="Helvetica", penwidth=1.5];
+
+  subgraph cluster_host {
+    label="the-box (real host filesystem)";
+    fontcolor="#39ffb0";
+    color="#39ffb0";
+    style=dashed;
+    bgcolor="#0d1f18";
+    home [shape=folder, fillcolor="#152a3a", color="#39d0ff", label="/home/smduck\n(untouched — not mounted)"];
+    docs [shape=folder, fillcolor="#152a3a", color="#39d0ff", label="Documents/ (everything except\nhermes-sessions/ — untouched)"];
+    ws [shape=folder, fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5, label="Documents/hermes-sessions/\n(the ONLY writable mount)"];
+  }
+
+  hermes [shape=box, fillcolor="#0f2a20", color="#39ffb0", label="Hermes Agent process\n(runs as your OS user)"];
+  term [shape=box, fillcolor="#0f2a20", color="#39ffb0", label="terminal / write_file / execute_code\ntool calls"];
+
+  subgraph cluster_container {
+    label="Docker sandbox container\n--cap-drop ALL  --user 1000:1000\n--security-opt no-new-privileges  --pids-limit 256";
+    fontcolor="#39ffb0";
+    color="#39ffb0";
+    style=dashed;
+    bgcolor="#0d1f18";
+    workspace [shape=folder, fillcolor="#0f2a20", color="#39ffb0", label="/workspace\n(bind-mounted rw)"];
+    croot [shape=folder, fillcolor="#152a3a", color="#39d0ff", label="/root\n(sandbox-only scratch home,\nnever the real /root)"];
+    skillsro [shape=folder, fillcolor="#1a1f26", color="#556070", label="~/.hermes/skills, cache/*\n(read-only mounts)"];
+  }
+
+  hermes -> term;
+  term -> workspace [label="rm -rf here at worst\ndestroys only /workspace"];
+  workspace -> ws [label="bind mount", penwidth=2.5];
+  term -> croot [style=dotted];
+  term -> skillsro [style=dotted, color="#556070"];
+
+  home -> docs [color="#556070"];
+  docs -> ws [color="#556070"];
+
+  block [shape=octagon, fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+         label="/home/smduck itself:\nnot mounted → any escape attempt\nfails with Permission denied"];
+  term -> block [style=dashed, color="#ff4d4d", label="attempted reach\n(now blocked)"];
+}

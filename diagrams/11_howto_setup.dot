@@ -1,0 +1,22 @@
+digraph HowTo {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="How to apply this to your own Hermes Agent install";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#39ffb0", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  s1 [fillcolor="#0f2a20", color="#39ffb0", label="1. Back up ~/.hermes/config.yaml\ncp config.yaml config.yaml.bak-$(date +%s)"];
+  s2 [fillcolor="#0f2a20", color="#39ffb0", label="2. Set terminal.backend: docker\n+ docker_volumes scoped to ONE\nspecific working directory"];
+  s3 [fillcolor="#0f2a20", color="#39ffb0", label="3. Set docker_run_as_host_user: true\n(files stay owned by you, not root)"];
+  s4 [fillcolor="#0f2a20", color="#39ffb0", label="4. Set checkpoints.enabled: true\n(the undo button)"];
+  s5 [fillcolor="#0f2a20", color="#39ffb0", label="5. Add approvals.deny globs for the\nexact destructive patterns you fear"];
+  s6 [fillcolor="#152a3a", color="#39d0ff", label="6. Pre-pull the docker_image\nso the first real run isn't slow"];
+  s7 [fillcolor="#152a3a", color="#39d0ff", penwidth=2.5, label="7. VERIFY before trusting it:\nrun a one-shot command, then\ndocker inspect the spawned container —\ncheck CapDrop, User, and the mount list"];
+  s8 [fillcolor="#0f2a20", color="#39ffb0", label="8. Tell the agent explicitly to write\ndeliverables to /workspace,\nnot its own container $HOME"];
+
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8;
+}

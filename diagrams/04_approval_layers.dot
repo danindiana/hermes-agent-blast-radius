@@ -1,0 +1,42 @@
+digraph ApprovalLayers {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Why the deletion was auto-approved: the two approval layers";
+  labelloc="t";
+  fontsize=20;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  cmd [fillcolor="#1a1f26", color="#556070", label="Command issued:\nrm -rf ~/Documents/hermes-sessions"];
+
+  hardline [fillcolor="#152a3a", color="#39d0ff", shape=diamond,
+            label="Hardline blocklist check\n(unconditional, NEVER bypassable)"];
+
+  hlpaths [fillcolor="#0f2a20", color="#39ffb0",
+           label="Matches only:\n/ , /home , /root , /etc , /usr ,\nliteral ~ or $HOME"];
+
+  gap [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+       label="GAP: a real subdirectory like\n~/Documents/hermes-sessions\ndoes NOT match any hardline pattern"];
+
+  smart [fillcolor="#152a3a", color="#39d0ff", shape=diamond,
+         label="Falls through to \"smart approval\"\n(auxiliary LLM judges risk)"];
+
+  judged [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+          label="Judged \"genuinely fine\" —\nauto-approved. 4 times."];
+
+  destroyed [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+             label="Executed. Full hermes-sessions/\ntree destroyed."];
+
+  fixed [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+         label="THE FIX: approvals.deny\n\"rm -rf ~/Documents/*\"\nuser-editable, unconditional,\ncloses this exact gap"];
+
+  cmd -> hardline;
+  hardline -> hlpaths;
+  hlpaths -> gap;
+  gap -> smart;
+  smart -> judged;
+  judged -> destroyed;
+  gap -> fixed [style=dashed, color="#39ffb0", label="patched by"];
+}

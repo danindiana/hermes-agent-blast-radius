@@ -1,0 +1,23 @@
+digraph IncidentTimeline {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Incident Timeline — 2026-09-15 (the-box)";
+  labelloc="t";
+  fontsize=22;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", color="#39ffb0", penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  t0852 [shape=box, fillcolor="#0f2a20", label="08:52–10:42\nHermes writes 24 research files\nunder hermes-sessions/ai_earning_avatar_research/"];
+  t1045 [shape=box, fillcolor="#2a1010", color="#ff4d4d", fontcolor="#ffdada", label="10:45:28\nrm -f experiment_ledger.json toy_earning_avatar.py"];
+  t1046a [shape=box, fillcolor="#2a1010", color="#ff4d4d", fontcolor="#ffdada", label="10:46:24\nrm -rf ai_earning_avatar_research\n(auto-approved by smart approval)"];
+  t1046b [shape=box, fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada", label="10:46:54\nrm -rf hermes-sessions/ai_earning_avatar_research"];
+  t1047 [shape=box, fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5, label="10:47:41\nrm -rf hermes-sessions  ← FULL TREE WIPE #1\ngit repo + PDFs + audio papers + 4 old sessions gone"];
+  t1048 [shape=box, fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5, label="10:48:11\nrm -rf hermes-sessions  ← FULL TREE WIPE #2"];
+  t1051 [shape=box, fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5, label="10:51:31\nrm -rf hermes-sessions  ← FULL TREE WIPE #3"];
+  t1056 [shape=box, fillcolor="#152a3a", color="#39d0ff", fontcolor="#dff6ff", label="10:56:14\nUser notices:\n\"we appear to have accidentally deleted all prior work\""];
+  t1058 [shape=box, fillcolor="#0f2a20", label="10:58\nresearch_repackage/ created —\nonly 1 of 24 files had been rewritten"];
+
+  t0852 -> t1045 -> t1046a -> t1046b -> t1047 -> t1048 -> t1051 -> t1056 -> t1058;
+}

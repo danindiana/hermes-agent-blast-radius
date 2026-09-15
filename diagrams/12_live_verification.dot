@@ -1,0 +1,30 @@
+digraph LiveVerification {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Verified on a real, user-started session — not just a config file";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  launch [fillcolor="#1a1f26", color="#556070", label="User launches a real,\ninteractive Hermes session"];
+  inspect [fillcolor="#152a3a", color="#39d0ff", label="docker inspect <container>"];
+  ev1 [fillcolor="#0f2a20", color="#39ffb0", label="CapDrop = [ALL]"];
+  ev2 [fillcolor="#0f2a20", color="#39ffb0", label="User = 1000:1000\n(host UID, not root)"];
+  ev3 [fillcolor="#0f2a20", color="#39ffb0", label="SecurityOpt =\n[no-new-privileges]"];
+  ev4 [fillcolor="#0f2a20", color="#39ffb0", label="Mounts: ONLY hermes-sessions/\n→ /workspace (rw)\n/home/smduck absent from list"];
+  proof [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+         label="Agent, out of habit, runs:\nmkdir /home/smduck"];
+  denied [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+          label="mkdir: cannot create directory\n'/home/smduck': Permission denied\n\n← the exact class of command that\ndestroyed everything, now harmless"];
+
+  launch -> inspect;
+  inspect -> ev1;
+  inspect -> ev2;
+  inspect -> ev3;
+  inspect -> ev4;
+  launch -> proof [style=dashed];
+  proof -> denied;
+}

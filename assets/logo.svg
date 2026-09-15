@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200">
+  <defs>
+    <radialGradient id="blast" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ff4d4d" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#ffa93a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffa93a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#39ffb0"/>
+      <stop offset="100%" stop-color="#39d0ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="640" height="200" fill="#0a0e12"/>
+
+  <g transform="translate(100,100)">
+    <circle r="70" fill="url(#blast)"/>
+    <circle r="46" fill="none" stroke="url(#ring)" stroke-width="4" filter="url(#glow)"/>
+    <circle r="46" fill="none" stroke="#0a0e12" stroke-width="14" stroke-dasharray="4 10" opacity="0.0"/>
+    <!-- containment ring segments (broken = blast radius contained) -->
+    <circle r="46" fill="none" stroke="url(#ring)" stroke-width="6"
+            stroke-dasharray="18 8" transform="rotate(-20)"/>
+    <!-- danger core -->
+    <path d="M0,-22 L7,-4 L24,-4 L10,7 L15,24 L0,13 L-15,24 L-10,7 L-24,-4 L-7,-4 Z"
+          fill="#ff4d4d" filter="url(#glow)"/>
+  </g>
+
+  <text x="190" y="90" font-family="Helvetica, Arial, sans-serif" font-size="42"
+        font-weight="700" fill="#dfe6ee">hermes-agent</text>
+  <text x="190" y="140" font-family="Helvetica, Arial, sans-serif" font-size="42"
+        font-weight="700" fill="#39ffb0">blast-radius</text>
+  <text x="192" y="168" font-family="Helvetica, Arial, sans-serif" font-size="15"
+        fill="#8a97a6">an accidental rm -rf, root-caused and contained</text>
+</svg>

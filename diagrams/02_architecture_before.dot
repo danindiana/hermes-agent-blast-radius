@@ -1,0 +1,34 @@
+digraph ArchitectureBefore {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Architecture BEFORE the fix — terminal.backend: local";
+  labelloc="t";
+  fontsize=22;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", color="#556070", penwidth=1.5];
+  edge [color="#ff4d4d", fontcolor="#ffa93a", fontname="Helvetica", penwidth=1.5];
+
+  subgraph cluster_host {
+    label="the-box (real host filesystem)";
+    fontcolor="#ffa93a";
+    color="#ffa93a";
+    style=dashed;
+    bgcolor="#150d0d";
+    home [shape=folder, fillcolor="#2a1010", color="#ff4d4d", label="/home/smduck\n(entire real home directory)"];
+    docs [shape=folder, fillcolor="#2a1010", color="#ff4d4d", label="Documents/\ngit repo · PDFs · audio papers\nold session folders"];
+    desk [shape=folder, fillcolor="#2a1010", color="#ff4d4d", label="Desktop/, .ssh/, .config/\n(everything else you own)"];
+  }
+
+  hermes [shape=box, fillcolor="#0f2a20", color="#39ffb0", label="Hermes Agent process\n(runs as your OS user)"];
+  term [shape=box, fillcolor="#0f2a20", color="#39ffb0", label="terminal / write_file / execute_code\ntool calls"];
+
+  hermes -> term;
+  term -> home [label="direct, unrestricted\nfilesystem access", penwidth=2.5];
+  home -> docs;
+  home -> desk;
+
+  note [shape=note, fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+        label="No sandbox boundary.\nAny tool call has the same\nfilesystem reach as the human user."];
+  term -> note [style=dotted, color="#ff4d4d"];
+}

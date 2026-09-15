@@ -1,0 +1,27 @@
+digraph MountScoping {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="docker_volumes: the allowlist that makes this work";
+  labelloc="t";
+  fontsize=20;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#39ffb0", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  cfg [fillcolor="#152a3a", color="#39d0ff", shape=note,
+       label="terminal.docker_volumes:\n  - \"/home/smduck/Documents/hermes-sessions:/workspace:rw\""];
+
+  mounted [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+           label="hermes-sessions/  →  /workspace (rw)\nONLY path listed = ONLY path reachable"];
+
+  ro1 [fillcolor="#1a1f26", color="#556070", label="~/.hermes/skills → ro"];
+  ro2 [fillcolor="#1a1f26", color="#556070", label="~/.hermes/cache/* → ro"];
+  notmounted [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada", penwidth=2.5,
+              label="/home/smduck\n/home/smduck/Documents\n(NOT in the list = NOT mounted\n= physically absent inside the container)"];
+
+  cfg -> mounted;
+  mounted -> ro1 [style=dotted, color="#556070"];
+  mounted -> ro2 [style=dotted, color="#556070"];
+  cfg -> notmounted [style=dashed, color="#ff4d4d", label="anything unlisted"];
+}

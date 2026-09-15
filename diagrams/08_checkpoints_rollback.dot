@@ -1,0 +1,24 @@
+digraph Checkpoints {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="checkpoints.enabled: the undo button this incident didn't have";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  turn [fillcolor="#1a1f26", color="#556070", label="Agent turn about to run a\ndestructive command\n(rm, mv, cp, sed -i, git reset/clean, …)"];
+  ensure [fillcolor="#152a3a", color="#39d0ff", label="CheckpointManager.ensure_checkpoint()\n(once per directory per turn)"];
+  shadow [fillcolor="#0f2a20", color="#39ffb0", shape=cylinder,
+          label="Shared shadow git repo\n~/.hermes/checkpoints/store/\n(your real .git is never touched)"];
+  run [fillcolor="#1a1f26", color="#556070", label="Destructive command runs"];
+  rollback [shape=diamond, fillcolor="#152a3a", color="#39d0ff", label="Something went wrong?"];
+  cmd [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5, label="/rollback <N>\nrestores the snapshot taken\nright before the command"];
+  fine [fillcolor="#1a1f26", color="#556070", label="All good — snapshot just\nages out per max_snapshots"];
+
+  turn -> ensure -> shadow -> run -> rollback;
+  rollback -> cmd [label="yes"];
+  rollback -> fine [label="no"];
+}

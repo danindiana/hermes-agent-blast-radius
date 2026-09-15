@@ -1,0 +1,30 @@
+digraph RecoveryAttempt {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Data-recovery attempt: what was tried, and why it stopped";
+  labelloc="t";
+  fontsize=20;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  start [fillcolor="#1a1f26", color="#556070", label="Deletion discovered\n(root filesystem, ext4, mounted, live)"];
+  debugfs [fillcolor="#152a3a", color="#39d0ff", label="debugfs -R lsdel\n(read-only, safe on mounted fs)"];
+  zero [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+        label="0 deleted inodes found\n(known ext4 limitation:\nextent-mapped files don't\npreserve lsdel metadata)"];
+  extundelete [fillcolor="#152a3a", color="#39d0ff", label="extundelete --restore-directory\n(installed via apt, low risk)"];
+  refused [fillcolor="#3a0d0d", color="#ff4d4d", fontcolor="#ffdada",
+           label="Exit 2: refuses to run —\nfilesystem is mounted (root fs,\ncan't unmount without a reboot)"];
+  choice [shape=diamond, fillcolor="#152a3a", color="#39d0ff",
+          label="Options presented to user:\nphotorec carve · reboot to rescue mode · stop"];
+  photorec [fillcolor="#1a1f26", color="#556070", label="photorec (no reboot)\nonly recovers files with a\nmagic-byte header (e.g. the PDF) —\nJSON/Markdown have none"];
+  reboot [fillcolor="#1a1f26", color="#556070", label="Reboot to rescue mode\ndisruptive, uncertain payoff\ngiven the same ext4 caveat"];
+  stopped [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+           label="User's choice: STOP.\nDocument the loss,\nfix the root cause instead"];
+
+  start -> debugfs -> zero -> extundelete -> refused -> choice;
+  choice -> photorec [style=dashed];
+  choice -> reboot [style=dashed];
+  choice -> stopped [penwidth=2.5, color="#39ffb0"];
+}
