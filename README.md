@@ -279,6 +279,53 @@ command already goes through — a deliberate, manually-toggled trade-off, never
 default. See
 [`.../03_tiered_policy`](diagrams/14_addendum_sandbox_package_installs/03_tiered_policy.svg).
 
+## Addendum: production-testing the fixes for real
+
+Two of the three original containerization-fix settings (`approvals.deny`,
+`checkpoints.enabled`) were configured and read-back-verified, but never actually exercised
+against a real destructive command until now. Did both, end-to-end, against the live system.
+
+**`approvals.deny` — confirmed working.**
+```
+$ hermes -z "run: rm -rf test_deny_dir/"
+The command `rm -rf test_deny_dir/` was blocked by the user-defined deny rule `rm -rf */`
+in `approvals.deny` (config.yaml). The agent cannot execute this command, not even with
+--yolo, /yolo, or approvals.mode=off.
+```
+The target directory was confirmed intact afterward — this is the exact rule closing the gap in
+Hermes's hardline blocklist that let the original incident happen. See
+[`diagrams/15_addendum_production_testing/01_deny_rule_confirmed`](diagrams/15_addendum_production_testing/01_deny_rule_confirmed.svg).
+
+**A methodology trap along the way, worth documenting on its own.** Testing `checkpoints` first
+looked like the model was fabricating tool results — files it claimed to write never showed up
+under `~/Documents/hermes-sessions/`, and `agent.log` showed no matching tool-call lines. It
+wasn't fabricating anything: checking `~/.hermes/state.db`'s `messages` table directly showed
+real `terminal`/`read_file` tool calls with correct, real output. The actual cause: **a fresh
+one-shot (`-z`) session's terminal `cwd` defaults to the container's own `$HOME` (`/root`), not
+`/workspace`** — so relative paths land under
+`~/.hermes/sandboxes/docker/default/home/...` on the host, not the expected workspace directory.
+This **independently reproduces, via a completely different mechanism (CLI one-shot mode, not an
+"open in editor" helper), the exact same container-`$HOME`-vs-`/workspace` footgun** already
+documented above — two unrelated code paths hitting the same sharp edge is good evidence it's
+systemic, not a one-off. See
+[`.../02_methodology_trap_cwd`](diagrams/15_addendum_production_testing/02_methodology_trap_cwd.svg).
+
+**`checkpoints.enabled` — a real gap found, not a clean pass.** With the `cwd` confusion
+resolved, ran a real, confirmed `rm -f` against a container-`$HOME` file (`rm` is explicitly on
+Hermes's documented checkpoint-trigger list). No checkpoint was created for it — `hermes
+checkpoints status` showed only a pre-existing, unrelated `/workspace` project, unchanged.
+**Checkpoints only protect recognized `/workspace`-mapped project directories, not the sandbox's
+own container `$HOME`** — meaning the exact files most likely to end up misplaced there (per the
+finding above) are also the ones the "undo button" doesn't cover. See
+[`.../03_checkpoints_gap`](diagrams/15_addendum_production_testing/03_checkpoints_gap.svg).
+
+**Net assessment:** a repeat of the original incident is still blocked (`approvals.deny`) and
+still bounded (Docker mount scoping — worst case is the container's own disposable scratch home,
+never `/home/smduck`) even with the checkpoints gap. Recommended fix, no config change needed:
+tell the agent explicitly to always operate under `/workspace`, never its own `$HOME` — solves
+both the findability problem and the checkpoint-coverage gap at once. See
+[`.../04_overall_risk_assessment`](diagrams/15_addendum_production_testing/04_overall_risk_assessment.svg).
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -325,6 +372,11 @@ diagrams/
     02_buildtime_vs_runtime_privilege.{dot,svg,png}
     03_tiered_policy.{dot,svg,png}
     04_verification_evidence.{dot,svg,png}
+  15_addendum_production_testing/
+    01_deny_rule_confirmed.{dot,svg,png}
+    02_methodology_trap_cwd.{dot,svg,png}
+    03_checkpoints_gap.{dot,svg,png}
+    04_overall_risk_assessment.{dot,svg,png}
 docker/hermes-sandbox-graphviz/Dockerfile   # the validated derived-image recipe (Graphviz example)
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```

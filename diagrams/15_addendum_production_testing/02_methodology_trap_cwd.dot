@@ -1,0 +1,28 @@
+digraph MethodologyTrap {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="A methodology trap: \"the model is hallucinating tool results\" — it wasn't";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  test [fillcolor="#1a1f26", color="#556070", label="hermes -z: write/read a marker file\nat relative path test_checkpoint_dir/marker.txt"];
+  claim [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+         label="Reported success — but file not found\nat ~/Documents/hermes-sessions/...\nand no matching agent.log tool lines"];
+  suspect [shape=diamond, fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+           label="Looks like: model fabricated\na plausible tool result"];
+  checkdb [fillcolor="#152a3a", color="#39d0ff", label="Checked ground truth directly:\nsqlite3 ~/.hermes/state.db messages table"];
+  realcalls [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+             label="Real terminal + read_file tool-call rows,\nwith correct, real output — the calls\nwere genuine, not fabricated"];
+  realcause [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+             label="ACTUAL cause: a fresh one-shot session's\nterminal cwd defaults to the container's\n$HOME (/root), not /workspace"];
+  mirror [fillcolor="#0f2a20", color="#39ffb0",
+          label="Files found exactly where expected once\nchecked: ~/.hermes/sandboxes/docker/default/\nhome/test_checkpoint_dir/marker.txt"];
+  corroborate [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+               label="Independently reproduces the SAME\ncontainer-$HOME-vs-workspace footgun\nfrom the earlier \"empty report.md\" incident —\nvia a completely different mechanism (CLI, not editor)"];
+
+  test -> claim -> suspect -> checkdb -> realcalls -> realcause -> mirror -> corroborate;
+}

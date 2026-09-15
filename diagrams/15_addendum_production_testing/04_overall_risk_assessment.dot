@@ -1,0 +1,29 @@
+digraph OverallRisk {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Net assessment after production testing";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  layer1 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+          label="LAYER 1 — Docker mount scoping\nCONFIRMED (repeatedly, this session):\nonly hermes-sessions/ writable,\n/home/smduck never mounted"];
+  layer2 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+          label="LAYER 2 — approvals.deny\nCONFIRMED WORKING:\nunconditional, path-agnostic,\nblocks the exact original command shape"];
+  layer3 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+          label="LAYER 3 — checkpoints.enabled\nGAP: does not cover the container's\nown $HOME, only /workspace projects"];
+
+  net [fillcolor="#152a3a", color="#39d0ff", penwidth=2.5,
+       label="Net: a repeat of the original incident is\nstill blocked (layer 2) and still bounded\n(layer 1) even with the layer-3 gap —\nbut the \"undo button\" doesn't reach exactly\nthe files most likely to be misplaced there"];
+
+  action [fillcolor="#0f2a20", color="#39ffb0",
+          label="Recommended: tell the agent explicitly\nto always operate under /workspace,\nnever its own $HOME — fixes findability\nAND checkpoint coverage, no config change needed"];
+
+  layer1 -> net;
+  layer2 -> net;
+  layer3 -> net;
+  net -> action;
+}

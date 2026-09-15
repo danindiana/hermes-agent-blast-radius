@@ -1,0 +1,32 @@
+digraph CheckpointsGap {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Production test 2: checkpoints.enabled — GAP FOUND";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  cmdA [fillcolor="#152a3a", color="#39d0ff", label="rm against /workspace-mapped path\n(hermes-sessions/new_frontier)"];
+  ckA [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+       label="Checkpoint exists for this project —\ncovered as documented"];
+
+  cmdB [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+        label="rm -f /root/test_checkpoint_dir/marker.txt\n(container's own $HOME — a real,\nconfirmed, on-trigger-list delete)"];
+  ckB [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+       label="hermes checkpoints status:\nNO new entry — only the pre-existing\n/workspace project shows up, unchanged"];
+
+  conclusion [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+              label="checkpoints only protects recognized\n/workspace-mapped project directories —\nNOT the sandbox's own container $HOME"];
+
+  risk [fillcolor="#0f2a20", color="#39ffb0",
+        label="Still bounded: approvals.deny doesn't care\nWHERE a command targets, and Docker mount\nscoping caps the worst case to the container's\nown disposable scratch home — never /home/smduck"];
+
+  cmdA -> ckA;
+  cmdB -> ckB;
+  ckA -> conclusion [style=dotted, color="#556070"];
+  ckB -> conclusion;
+  conclusion -> risk;
+}

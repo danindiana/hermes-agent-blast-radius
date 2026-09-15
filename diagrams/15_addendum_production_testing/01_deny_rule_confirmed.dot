@@ -1,0 +1,22 @@
+digraph DenyConfirmed {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Production test 1: approvals.deny — CONFIRMED WORKING";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  cmd [fillcolor="#1a1f26", color="#556070", label="hermes -z \"run: rm -rf test_deny_dir/\""];
+  gate [fillcolor="#152a3a", color="#39d0ff", label="approvals.deny check\n(\"rm -rf */\" glob)"];
+  blocked [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+           label="BLOCKED: matches user-defined\ndeny rule 'rm -rf */'.\nNot bypassable — not --yolo,\nnot /yolo, not mode=off."];
+  intact [fillcolor="#0f2a20", color="#39ffb0", label="Target directory confirmed\nintact afterward"];
+  origin [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+          label="This is the exact rule added to close\nthe hardline-blocklist gap that let the\noriginal rm -rf incident happen"];
+
+  cmd -> gate -> blocked -> intact;
+  origin -> gate [style=dotted, color="#ffa93a"];
+}
