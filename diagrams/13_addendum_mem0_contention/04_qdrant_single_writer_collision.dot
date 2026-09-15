@@ -1,0 +1,32 @@
+digraph QdrantCollision {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="mem0's embedded Qdrant store: single-writer, multiple clients";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  store [shape=cylinder, fillcolor="#152a3a", color="#39d0ff", penwidth=2.5,
+         label="~/.hermes/mem0_qdrant/\n(embedded, file-locked,\nsingle-writer local Qdrant)"];
+
+  parent [fillcolor="#0f2a20", color="#39ffb0", label="Parent session's\nAIAgent + memory manager\n(opens first, holds the lock)"];
+
+  fork [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", label="Background-review fork's\nOWN AIAgent + memory manager\n(opens second)"];
+
+  fail [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+        label="\"Mem0 backend failed to initialize\n(oss mode): Storage folder ... is\nalready accessed by another\ninstance of Qdrant client\""];
+
+  toolerr [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+           label="mem0_search / mem0_add\nreturn \"Unknown tool\"\nin the foreground session"];
+
+  heal [fillcolor="#0f2a20", color="#39ffb0", label="Self-healing: once the fork's\nreview completes and releases\nits handle, inserts resume normally"];
+
+  parent -> store [penwidth=2.5];
+  fork -> store [style=dashed, color="#ffa93a"];
+  fork -> fail;
+  fail -> toolerr;
+  fail -> heal [style=dotted];
+}

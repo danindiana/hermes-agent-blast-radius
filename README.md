@@ -162,6 +162,55 @@ Sandboxing an agent's own filesystem access isn't free of trade-offs:
 
 See [`diagrams/10_catch22s`](diagrams/10_catch22s.svg).
 
+## Addendum: background-review model contention & mem0 lock collisions
+
+Days after the Docker fix above, a *different* observation came up: `nemotron-3.5-lightning:1m`
+seemed to be running in the background while the foreground session was on `muse-glimmer:30b`.
+The obvious guess was that mem0 (the memory layer) hadn't been "migrated" into the new Docker
+sandbox. **That guess was wrong, but the underlying observation was real** — just caused by
+something older and unrelated.
+
+**What's actually true:** mem0 was never inside the terminal sandbox to begin with — it talks to
+Ollama directly over HTTP, exactly like the main chat model, completely outside the
+`terminal`/`write_file`/`execute_code` tools that got Dockerized. There's nothing to migrate. The
+same `"Storage folder ... already accessed by another instance of Qdrant client"` error recurs in
+the logs back to **2026-09-13** — two full days before the Docker change existed. See
+[`13_addendum_mem0_contention/01_hypothesis_vs_reality`](diagrams/13_addendum_mem0_contention/01_hypothesis_vs_reality.svg)
+and
+[`.../05_recurrence_history`](diagrams/13_addendum_mem0_contention/05_recurrence_history.svg).
+
+**What's actually happening:** Hermes's own background-review pass (`agent/background_review.py`
+— the mechanism that updates memory and skills after a turn) spawns as a **fork that inherits the
+parent session's model at fork-creation time**, verbatim from its own docstring: *"The fork
+inherits the parent's live runtime (provider, model, credentials, cached system prompt)."*
+Caught live in a real session:
+
+| Time | Event |
+|------|-------|
+| 13:33:21 | Foreground turn ends on `nemotron-3.5-lightning:1m`; a background-review fork is created, inheriting that model |
+| 13:33:59 | User switches the **foreground** model in-place: `nemotron-3.5-lightning:1m -> muse-glimmer:30b` |
+| 13:34:23–13:34:51 | Foreground correctly shows `muse-glimmer:30b` — but the already-running fork keeps calling `nemotron-3.5-lightning:1m`, because its client was bound before the switch |
+| 13:34:37 | The fork's own memory-provider client collides with the parent's already-open embedded Qdrant store; `mem0_search`/`mem0_add` briefly return `"Unknown tool"` in the foreground |
+| **14:06:08** | Background review finally completes — **all 12 of its calls ran on `nemotron-3.5-lightning:1m`**, concurrently with ~32 minutes of foreground `muse-glimmer:30b` usage |
+
+See
+[`.../02_background_review_fork`](diagrams/13_addendum_mem0_contention/02_background_review_fork.svg)
+and
+[`.../03_incident_timeline`](diagrams/13_addendum_mem0_contention/03_incident_timeline.svg).
+
+**The mem0 collision, separately:** mem0's embedded/local Qdrant store is single-writer. When the
+background-review fork's own `AIAgent` instance opens its own memory-provider client against the
+same store the parent session already has open, the second open is refused outright — mem0 says
+so itself: *"If you require concurrent access, use Qdrant server instead."* It's self-healing
+(inserts resume once the colliding fork's review finishes) but it's a real, repeating symptom. See
+[`.../04_qdrant_single_writer_collision`](diagrams/13_addendum_mem0_contention/04_qdrant_single_writer_collision.svg).
+
+**Diagnosed, not yet applied** — two independent fixes: pin `auxiliary.background_review.model`
+to an explicit small/cheap model instead of `auto` (so a review fork can no longer silently
+double-book whatever large model the user just switched away from), and move mem0 off embedded
+Qdrant to a real Qdrant *server* process, which supports concurrent clients. See
+[`.../06_recommended_fixes`](diagrams/13_addendum_mem0_contention/06_recommended_fixes.svg).
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -196,6 +245,13 @@ diagrams/
   10_catch22s.{dot,svg,png}
   11_howto_setup.{dot,svg,png}
   12_live_verification.{dot,svg,png}
+  13_addendum_mem0_contention/
+    01_hypothesis_vs_reality.{dot,svg,png}
+    02_background_review_fork.{dot,svg,png}
+    03_incident_timeline.{dot,svg,png}
+    04_qdrant_single_writer_collision.{dot,svg,png}
+    05_recurrence_history.{dot,svg,png}
+    06_recommended_fixes.{dot,svg,png}
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```
 

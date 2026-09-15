@@ -1,0 +1,28 @@
+digraph BackgroundReviewFork {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="background_review.py: a fork that inherits the parent's runtime";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  turnend [fillcolor="#1a1f26", color="#556070", label="Foreground turn ends"];
+  spawn [fillcolor="#152a3a", color="#39d0ff", label="Background-review fork spawned\n(agent/background_review.py)"];
+  snapshot [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+            label="Docstring, verbatim:\n\"The fork inherits the parent's\nlive runtime (provider, model,\ncredentials, cached system prompt)\""];
+  bound [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+         label="Fork's OpenAI client is now bound\nto whatever model was active\nAT THIS EXACT MOMENT"];
+  fgswitch [fillcolor="#152a3a", color="#39d0ff", label="Meanwhile: foreground session\nswitches model in-place\n(/model or switch_model)"];
+  stale [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+         label="Fork's binding is now STALE —\nit keeps calling the OLD model\nfor the rest of its review,\nregardless of the foreground switch"];
+  ownmem0 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+           label="Fork's own AIAgent instance also\nre-registers its own mem0\nmemory-provider client"];
+
+  turnend -> spawn -> snapshot -> bound;
+  fgswitch -> stale [style=dashed, color="#ffa93a"];
+  bound -> stale;
+  bound -> ownmem0;
+}

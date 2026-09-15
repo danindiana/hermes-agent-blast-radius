@@ -20,15 +20,18 @@ jobs:
       - name: Re-render every .dot and diff against the committed SVG
         run: |
           set -e
+          shopt -s globstar
           fail=0
-          for dotfile in diagrams/*.dot; do
+          for dotfile in diagrams/**/*.dot; do
             base="${dotfile%.dot}"
-            dot -Tsvg "$dotfile" -o "/tmp/$(basename "$base").svg"
-            if ! diff -q "/tmp/$(basename "$base").svg" "${base}.svg" > /dev/null; then
+            tmpsvg="$(mktemp --suffix=.svg)"
+            tmppng="$(mktemp --suffix=.png)"
+            dot -Tsvg "$dotfile" -o "$tmpsvg"
+            if ! diff -q "$tmpsvg" "${base}.svg" > /dev/null; then
               echo "::error file=${dotfile}::rendered SVG does not match committed ${base}.svg — re-render and commit"
               fail=1
             fi
             # PNG is not byte-stable across Graphviz builds; smoke-test only.
-            dot -Tpng "$dotfile" -o "/tmp/$(basename "$base").png"
+            dot -Tpng "$dotfile" -o "$tmppng"
           done
           exit $fail

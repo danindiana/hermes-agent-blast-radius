@@ -1,0 +1,22 @@
+digraph RecommendedFixes {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Two independent fixes (diagnosed, not yet applied)";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#39ffb0", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  p1 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="Problem 1:\nbg-review fork inherits a stale model\nafter a mid-session /model switch"];
+  f1 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+      label="Fix: pin auxiliary.background_review.model\nto an explicit small/cheap model instead of\n\"auto\" — stops silent double-booking of\nwhatever large model was just switched away from"];
+
+  p2 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="Problem 2:\nembedded/local Qdrant is single-writer;\nconcurrent AIAgent forks collide on it"];
+  f2 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+      label="Fix: run a real Qdrant SERVER process\ninstead of embedded/local mode — mem0's\nown error message says this explicitly:\n\"use Qdrant server instead\""];
+
+  p1 -> f1;
+  p2 -> f2;
+}

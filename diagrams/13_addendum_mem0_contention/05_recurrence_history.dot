@@ -1,0 +1,22 @@
+digraph RecurrenceHistory {
+  rankdir=LR;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="This predates the Docker terminal-backend change by 2 days";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  d13 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="2026-09-13\n17:57 · 18:22 · 18:25 · 18:26\n19:43 · 20:18 · 20:20 · 20:30 · 20:33\nfirst \"already accessed\" errors"];
+  d14 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="2026-09-14\n03:24 · 13:42 · 14:24\n19:35 · 19:37 · 19:37 · 19:46 · 19:47 · 19:53\nmore recurrences"];
+  d15docker [fillcolor="#152a3a", color="#39d0ff", penwidth=2.5,
+             label="2026-09-15 midday\nDocker terminal-backend applied\n(session_1789487902) —\nunrelated subsystem"];
+  d15 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+       label="2026-09-15 13:34:37\nSAME error recurs —\nafter the Docker change,\nbut not caused by it"];
+  conclude [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+            label="Conclusion: a pre-existing,\nself-healing, recurring issue —\nnot introduced by the sandbox work"];
+
+  d13 -> d14 -> d15docker -> d15 -> conclude;
+}

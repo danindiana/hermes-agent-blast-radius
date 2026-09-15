@@ -1,0 +1,35 @@
+digraph HypothesisVsReality {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Addendum: \"is a mem0 instance not migrated into the Docker container?\"";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  obs [fillcolor="#1a1f26", color="#556070", label="Observation:\n\"nemotron running in background\nwhile I'm chatting on muse-glimmer\""];
+
+  hyp [shape=diamond, fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da",
+       label="Hypothesis:\nmem0 not migrated into the\nDocker terminal-sandbox container"];
+
+  wrong [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+         label="FALSE — mem0 was never inside\nthe terminal sandbox to begin with.\nIt talks to Ollama directly over HTTP,\nsame as the main chat model."];
+
+  predate [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+           label="The exact same Qdrant-lock error\nrecurs back to 2026-09-13 —\ntwo days before the Docker\nchange even existed"];
+
+  real [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+        label="ACTUAL mechanism:\nHermes's own background-review fork\ninherits the parent's model\nAT FORK-CREATION TIME"];
+
+  confirmed [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+             label="Observation CONFIRMED TRUE —\njust via a different, older,\nunrelated mechanism"];
+
+  obs -> hyp;
+  hyp -> wrong;
+  wrong -> predate;
+  obs -> real [style=dashed, color="#39ffb0"];
+  real -> confirmed;
+  predate -> confirmed [style=dotted];
+}

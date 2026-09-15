@@ -1,0 +1,24 @@
+digraph AddendumTimeline {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Caught live: 32 minutes of real concurrent-model contention";
+  labelloc="t";
+  fontsize=18;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  t1 [fillcolor="#152a3a", color="#39d0ff", label="13:33:21\nForeground turn ends on nemotron-3.5-lightning:1m.\nbg-review fork created — inherits nemotron"];
+  t2 [fillcolor="#152a3a", color="#39d0ff", penwidth=2.5, label="13:33:59\nUser switches FOREGROUND model:\nnemotron-3.5-lightning:1m -> muse-glimmer:30b"];
+  t3 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+      label="13:34:23 – 13:34:51\nForeground correctly shows muse-glimmer:30b —\nbut the ALREADY-RUNNING fork keeps calling\nnemotron-3.5-lightning:1m"];
+  t4 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+      label="13:34:37\nFork's own mem0 client collides with the\nparent's open Qdrant store — \"already accessed\nby another instance\". mem0_search/mem0_add\nreturn \"Unknown tool\" briefly in the foreground"];
+  t5 [fillcolor="#152a3a", color="#39d0ff", label="13:36:03\nForeground: muse-glimmer:30b (normal)"];
+  t6 [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+      label="14:06:08\nBackground review finally completes:\n12 calls, 636,831 in / 4,567 out —\nALL 12 ran on nemotron-3.5-lightning:1m"];
+  t7 [fillcolor="#0f2a20", color="#39ffb0", label="14:07 (now)\nollama ps shows only muse-glimmer:30b —\nnemotron has since idled out"];
+
+  t1 -> t2 -> t3 -> t4 -> t5 -> t6 -> t7;
+}
