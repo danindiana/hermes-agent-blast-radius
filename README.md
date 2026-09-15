@@ -326,6 +326,18 @@ tell the agent explicitly to always operate under `/workspace`, never its own `$
 both the findability problem and the checkpoint-coverage gap at once. See
 [`.../04_overall_risk_assessment`](diagrams/15_addendum_production_testing/04_overall_risk_assessment.svg).
 
+**Applied and tested that recommendation, same session.** First attempt — an `AGENTS.md` at
+`~/.hermes/AGENTS.md` (agent-wide, seemed like the durable choice) — turned out to be a no-op:
+verified against Hermes's own context-file docs that `AGENTS.md` discovery, outside a git repo,
+checks *only* the actual working directory; `$HOME` is never consulted. Corrected placement to
+the actual project directory (`hermes-sessions/AGENTS.md` — the real launch `cwd` and the source
+of the `/workspace` mount), verified loaded by asking the agent to quote it back verbatim, then
+ran the exact ambiguous case that caused the original confusion: "write a file with just a
+relative filename." Result: the *reported/final* file correctly landed in `/workspace` — but a
+byproduct copy also appeared under `$HOME` seconds earlier in the same turn. **A real, measurable
+improvement, not a complete fix** — worth knowing rather than assuming success. See
+[`.../05_agents_md_mitigation_tested`](diagrams/15_addendum_production_testing/05_agents_md_mitigation_tested.svg).
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -377,6 +389,7 @@ diagrams/
     02_methodology_trap_cwd.{dot,svg,png}
     03_checkpoints_gap.{dot,svg,png}
     04_overall_risk_assessment.{dot,svg,png}
+    05_agents_md_mitigation_tested.{dot,svg,png}
 docker/hermes-sandbox-graphviz/Dockerfile   # the validated derived-image recipe (Graphviz example)
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```

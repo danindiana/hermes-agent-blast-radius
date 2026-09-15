@@ -1,0 +1,31 @@
+digraph AgentsMdMitigation {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Applying and testing the recommendation: an AGENTS.md workspace rule";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  try1 [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+        label="First attempt: ~/.hermes/AGENTS.md\n(agent-wide, seemed durable)"];
+  noop [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+        label="NO-OP — verified against Hermes's own docs:\nAGENTS.md discovery checks ONLY the actual cwd;\n$HOME is never consulted outside a git repo"];
+
+  try2 [fillcolor="#152a3a", color="#39d0ff", label="Correct placement:\nhermes-sessions/AGENTS.md\n(the real launch cwd AND /workspace source)"];
+  loaded [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+          label="Verified loaded: agent quotes the file\nverbatim when asked"];
+
+  behave [fillcolor="#152a3a", color="#39d0ff", label="Behavioral test: write a file\nwith just a relative filename\n(the exact ambiguous case)"];
+  partial [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+           label="PARTIAL improvement: final/reported file\ncorrectly lands in /workspace — but a\nbyproduct copy also appeared under $HOME\nseconds earlier in the same turn"];
+  honest [fillcolor="#0f2a20", color="#39ffb0",
+          label="Real, measurable steering effect,\nnot a complete fix — documented honestly\nrather than assumed"];
+
+  try1 -> noop;
+  try2 -> loaded;
+  loaded -> behave -> partial -> honest;
+  noop -> try2 [style=dashed, color="#ffa93a", label="corrected"];
+}
