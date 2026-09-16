@@ -1,0 +1,32 @@
+digraph ExistingMitigationGap {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Not undiagnosed by Hermes — an existing fix, still with a gap";
+  labelloc="t";
+  fontsize=15;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  fix [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+       label="_purge_stale_hermes_modules()\n(hermes_cli/update_cmd_maint.py:111)\nEvicts every checkout-owned module from\nsys.modules after a pull — built SPECIFICALLY\nfor this symptom (docstring names\nutils/file_signature as \"the field cases\")"];
+
+  call1 [fillcolor="#152a3a", color="#39d0ff", label="Called: update_cmd_config.py:186\n(every update-completion path, #111271)"];
+  call2 [fillcolor="#152a3a", color="#39d0ff", label="Called: update_cmd_fleet.py:362, :1304\n(gateway-restart recovery,\ncalled BEFORE the failing import)"];
+
+  stillfails [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+              label="Purge ran — ImportError STILL occurred\nin this instance"];
+
+  limitation [fillcolor="#3a2a08", color="#ffa93a", fontcolor="#fff3da", penwidth=2.5,
+              label="Purging's own documented limit:\n\"running frames keep their module objects\" —\na live reference bound earlier in the SAME\nprocess isn't touched by an sys.modules evict"];
+
+  ask [fillcolor="#152a3a", color="#39d0ff",
+       label="Filed upstream: not \"no fix exists,\"\nbut \"this exact instance got past it\" —\nfor maintainers to trace further"];
+
+  fix -> call1;
+  fix -> call2;
+  call2 -> stillfails;
+  stillfails -> limitation;
+  limitation -> ask;
+}

@@ -1,0 +1,26 @@
+digraph WhatHappened {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="A transient hermes update ImportError — what actually happened";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  run [fillcolor="#1a1f26", color="#556070", label="hermes update\n(git pull -> config migration ->\nplugin refresh -> gateway restart)"];
+  ok [fillcolor="#0f2a20", color="#39ffb0", label="\"Update complete! (v0.21.3) [main @ 30b22b54]\"\ncua-driver upgraded successfully"];
+  fail [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+        label="gateway auto-restart failed:\nImportError: cannot import name\n'file_signature' from 'utils'"];
+  atexit [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+          label="Same ImportError again, twice,\nin atexit cleanup callbacks\nat process exit"];
+  fresh [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+         label="Fresh hermes --version / hermes -z\nafter this: exit 0, works fine"];
+  retry [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+         label="Second hermes update run:\ncompleted cleanly, no error"];
+
+  run -> ok -> fail -> atexit;
+  atexit -> fresh [style=dashed, color="#39ffb0", label="confirmed non-blocking"];
+  fresh -> retry;
+}

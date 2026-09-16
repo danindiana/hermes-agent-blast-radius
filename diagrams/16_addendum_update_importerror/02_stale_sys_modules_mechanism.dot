@@ -1,0 +1,25 @@
+digraph StaleSysModules {
+  rankdir=TB;
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  label="Root mechanism: one long-lived process spans the git pull";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+
+  start [fillcolor="#1a1f26", color="#556070", label="hermes update process starts\nold utils.py (no file_signature)\nimported into sys.modules early"];
+  pull [fillcolor="#152a3a", color="#39d0ff", label="git pull rewrites utils.py on disk\n(adds file_signature) — SAME process\nkeeps running, does not restart itself"];
+  stale [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+         label="sys.modules['utils'] still points to\nthe OLD module object in memory"];
+  lazy [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0",
+        label="Later phase lazily imports fresh source\n(hermes_cli.config) expecting the NEW\nutils.py — but 'from utils import ...'\nresolves against the cached OLD object"];
+  boom [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", penwidth=2.5,
+        label="ImportError: file_signature\nnot found on the old cached module"];
+  fresh [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5,
+         label="A BRAND NEW process (next invocation)\nhas no stale cache — imports the real,\ncurrent utils.py cleanly"];
+
+  start -> pull -> stale -> lazy -> boom;
+  boom -> fresh [style=dashed, color="#39ffb0", label="only fixed by a fresh process"];
+}

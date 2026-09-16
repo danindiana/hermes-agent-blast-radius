@@ -338,6 +338,52 @@ byproduct copy also appeared under `$HOME` seconds earlier in the same turn. **A
 improvement, not a complete fix** — worth knowing rather than assuming success. See
 [`.../05_agents_md_mitigation_tested`](diagrams/15_addendum_production_testing/05_agents_md_mitigation_tested.svg).
 
+## Addendum: a transient `hermes update` ImportError (and its existing, incomplete mitigation)
+
+Separately from the sandbox work above: `hermes update` (upgrading to v0.21.3) threw this at the
+very end of the run:
+```
+⚠ Update incomplete — gateway auto-restart failed: cannot import name 'file_signature' from 'utils' (/home/smduck/.hermes/hermes-agent/utils.py)
+...
+Exception ignored in atexit callback: <function _stop_browser_cleanup_thread at ...>
+  File ".../hermes_cli/config.py", line 33, in <module>
+    from utils import atomic_replace, atomic_yaml_write, fast_safe_load, file_signature
+ImportError: cannot import name 'file_signature' from 'utils'
+```
+
+**Confirmed non-blocking before reporting anything.** `utils.py` on disk genuinely defines
+`file_signature`; a fresh `hermes --version`/`hermes -z` both worked immediately after (exit 0);
+`hermes gateway status` showed no gateway even running on this machine, so the "restart your
+gateway" advice didn't apply; every setting from the addenda above (Docker backend, checkpoints,
+deny rules) survived the update's own config migration untouched, and the sandbox still worked
+(`dot -V` re-verified). **A second `hermes update` run completed cleanly, no error.** See
+[`diagrams/16_addendum_update_importerror/01_what_happened`](diagrams/16_addendum_update_importerror/01_what_happened.svg)
+and
+[`.../04_verified_non_blocking`](diagrams/16_addendum_update_importerror/04_verified_non_blocking.svg).
+
+**Root cause: one long-lived process spans the git pull.** `hermes update` runs the whole
+pipeline (pull → config migration → plugin refresh → gateway restart) inside a single Python
+process that started *before* the pull. `utils.py` gained `file_signature` in this update;
+anything holding a stale `sys.modules['utils']` reference from earlier in that same process can
+hit an `ImportError` when a later phase lazily imports fresh source expecting the new symbol. A
+brand-new process (the very next invocation) has no such stale cache. See
+[`.../02_stale_sys_modules_mechanism`](diagrams/16_addendum_update_importerror/02_stale_sys_modules_mechanism.svg).
+
+**Not undiagnosed by the maintainers — an existing, documented fix, with an apparent gap.**
+`hermes_cli/update_cmd_maint.py`'s `_purge_stale_hermes_modules()` evicts every checkout-owned
+module from `sys.modules` after a pull specifically to prevent this — its own docstring names
+`utils` gaining `base_url_origin`/`file_signature` as "the field cases" that motivated it,
+referencing issue `#111271`. It's called from `update_cmd_config.py:186` (every completion path)
+and `update_cmd_fleet.py:362`/`:1304` — the second explicitly *before* the import that failed
+here. The purge ran, and the failure still occurred. Its own docstring already flags the likely
+limit: *"running frames keep their module objects"* — an eviction from `sys.modules` doesn't
+retroactively fix a name already bound in an executing frame from earlier in the same process.
+See [`.../03_existing_mitigation_gap`](diagrams/16_addendum_update_importerror/03_existing_mitigation_gap.svg).
+
+**Filed upstream**, scoped honestly: not "no fix exists," but "this exact instance got past an
+existing, documented fix, and it doesn't reproduce on retry" — useful signal, correctly weighted.
+See [NousResearch/hermes-agent#112522](https://github.com/NousResearch/hermes-agent/issues/112522).
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -390,6 +436,11 @@ diagrams/
     03_checkpoints_gap.{dot,svg,png}
     04_overall_risk_assessment.{dot,svg,png}
     05_agents_md_mitigation_tested.{dot,svg,png}
+  16_addendum_update_importerror/
+    01_what_happened.{dot,svg,png}
+    02_stale_sys_modules_mechanism.{dot,svg,png}
+    03_existing_mitigation_gap.{dot,svg,png}
+    04_verified_non_blocking.{dot,svg,png}
 docker/hermes-sandbox-graphviz/Dockerfile   # the validated derived-image recipe (Graphviz example)
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```
