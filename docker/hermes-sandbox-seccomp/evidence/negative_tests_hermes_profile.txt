@@ -1,0 +1,47 @@
+PASS deny ptrace errno=1
+PASS deny mount errno=1
+PASS deny umount2 errno=1
+PASS deny unshare errno=1
+PASS deny setns errno=1
+PASS deny bpf errno=1
+PASS deny perf_event_open errno=1
+PASS deny userfaultfd errno=1
+PASS deny io_uring_setup errno=1
+PASS deny keyctl errno=1
+PASS deny add_key errno=1
+PASS deny kexec_load errno=1
+PASS deny init_module errno=1
+PASS deny finit_module errno=1
+PASS deny reboot errno=1
+PASS deny chroot errno=1
+PASS deny pivot_root errno=1
+PASS deny personality errno=1
+PASS deny process_vm_readv errno=1
+PASS deny open_by_handle_at errno=1
+PASS deny name_to_handle_at errno=1
+PASS deny swapon errno=1
+PASS deny acct errno=1
+PASS deny settimeofday errno=1
+PASS deny fsopen errno=1
+PASS deny open_tree errno=1
+PASS deny move_mount errno=1
+PASS deny mknod errno=1
+PASS deny setuid errno=1
+PASS deny capset errno=1
+PASS deny mlockall errno=1
+PASS deny syslog errno=1
+PASS deny modify_ldt errno=1
+PASS deny pidfd_getfd errno=1
+PASS deny quotactl errno=1
+PASS deny sethostname errno=1
+PASS clone3 -> ENOSYS (glibc falls back to clone) errno=38
+PASS unshare(CLONE_NEWUSER) refused errno=1
+PASS clone(CLONE_NEWUSER) refused errno=1
+PASS deny socket AF_PACKET errno=1
+PASS deny socket AF_ALG errno=1
+PASS deny socket AF_VSOCK errno=1
+PASS deny socket AF_KEY errno=1
+PASS allow socket AF_UNIX 
+PASS allow socket AF_INET 
+PASS allow socket AF_INET6 
+PASS fork still works 

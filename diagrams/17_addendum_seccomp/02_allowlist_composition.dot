@@ -1,0 +1,20 @@
+digraph Composition {
+  rankdir=TB;
+  label="Where the 235 allowed syscalls come from (vs ~363 in Docker's default profile)";
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+  obs [fillcolor="#152a3a", color="#39d0ff", label="146 observed in the trace\n(2 independent runs of the suite)"];
+  den [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="-4 observed but DENIED on purpose\nclone3 (unfilterable) -> ENOSYS\nlandlock_create_ruleset, landlock_restrict_self\npkey_alloc (tools probe, then fall back)"];
+  rt [fillcolor="#2a2410", color="#ffa93a", label="+1 runtime requirement\nopenat2 — runc-init calls it after the\nfilter is loaded (found via SCMP_ACT_LOG audit)"];
+  mar [fillcolor="#2a2410", color="#ffa93a", label="+92 labelled margin (not observed)\nbenign libc/runtime calls: xattr, inotify,\nsignalfd, timers, setpgid, sendfile ... "];
+  fin [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5, label="235 allowed names\n(233 plain + clone + socket, the last two arg-filtered)"];
+  dflt [fillcolor="#1a1f26", color="#556070", label="Docker default (moby): 363 unconditional\n+ capability/arch-conditional groups\nincl. personality, process_vm_readv,\nmodify_ldt, AF_ALG sockets reachable"];
+  obs -> den [label="subtract"];
+  den -> rt -> mar -> fin;
+  fin -> dflt [style=dashed, dir=none, label="~35% smaller surface,\nplus arg filters"];
+}

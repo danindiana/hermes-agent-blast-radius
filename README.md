@@ -384,6 +384,87 @@ See [`.../03_existing_mitigation_gap`](diagrams/16_addendum_update_importerror/0
 existing, documented fix, and it doesn't reproduce on retry" — useful signal, correctly weighted.
 See [NousResearch/hermes-agent#112522](https://github.com/NousResearch/hermes-agent/issues/112522).
 
+## Addendum: a measured, default-deny seccomp allowlist for the sandbox
+
+The container fix bounds *where* the agent can write. It does not bound *what the agent's
+processes can ask the kernel to do*: the sandbox runs under Docker's default seccomp profile,
+which still allows ~363 syscall names plus capability-conditional groups. Instead of hand-writing a
+list, this addendum **measures** what the sandbox actually uses and turns that into a default-deny
+profile. Everything is in [`docker/hermes-sandbox-seccomp/`](docker/hermes-sandbox-seccomp/).
+
+![method](diagrams/17_addendum_seccomp/01_method_overview.svg)
+
+**Method.** A throwaway container with the same flags as the live sandbox (caps dropped,
+`no-new-privileges`, GPU devices, the sandbox network) but `seccomp=unconfined`, driven by a
+40-step scripted workload (`workload/run_suite.sh`: shell/coreutils, git, Python incl. threads,
+multiprocessing and pty, venv, torch on CPU **and GPU**, Nim and gcc builds, Graphviz, PDF/OCR,
+ffmpeg, pandoc, tmux, outbound HTTPS/DNS, ssh client, rsync, read-only mounts). Each step is a separate
+`docker exec bash -c`, which is how Hermes issues tool calls. Tracing used
+`perf trace -a -G <container cgroup>`: system-wide, cgroup-scoped, **no ptrace**, so it also sees
+processes spawned by `docker exec` (which `strace -p <init pid>` would miss) and has no attach race.
+`bpftrace` was not installed; `perf trace` needed no extra tooling. Runc's own setup process
+(comm `:` / `runc`) runs *before* the filter loads, so it is excluded from the allowlist.
+
+**Result.** 146 distinct syscalls observed across two runs.
+
+![composition](diagrams/17_addendum_seccomp/02_allowlist_composition.svg)
+
+Final profile: **235 allowed names** (143 observed/required + 92 labelled "margin" calls such as
+xattr, inotify, timers, `setpgid` that a different run of the same tools could take; the margin
+list is in `tools/build_profile.py`, each entry benign without capabilities), default action
+`SCMP_ACT_ERRNO` (EPERM), x86_64 only (no x32 or ia32 compat ABI).
+
+Three things the name list alone cannot do:
+
+![arg filters](diagrams/17_addendum_seccomp/03_argument_filters.svg)
+
+- **`clone` is flag-filtered**: no `CLONE_NEW*` flag, so the process cannot create new namespaces.
+- **`clone3` returns ENOSYS** instead of being allowed. Its flags live in a struct seccomp cannot
+  inspect, so allowing it would bypass the clone filter. glibc falls back to `clone()` on ENOSYS;
+  the trace contained 501 `clone3` calls (Python threads, ffmpeg) and every step still passed.
+- **`socket` is restricted** to `AF_UNIX`, `AF_INET`, `AF_INET6`, `AF_NETLINK`, the only families
+  observed. `AF_PACKET`, `AF_ALG`, `AF_VSOCK`, `AF_KEY` and the rest are refused.
+
+**Validation** (three independent checks, all in throwaway containers):
+
+![validation](diagrams/17_addendum_seccomp/04_validation_results.svg)
+
+1. *Enforced*: the full suite passes 40/40 under the profile.
+2. *Log mode* (`SCMP_ACT_LOG` default + kernel audit records): the suite produced 10 audit records,
+   all `xz` probing `landlock` (denied on purpose; xz continues). This is also how a gap was found
+   early: `openat2`, which runc-init calls **after** the filter is loaded, was missing from the
+   first draft, so the profile now includes it.
+3. *Negative tests* (`workload/negative_tests.py`, run inside the sandbox): 47/47 pass:
+   `ptrace`, `mount`, `unshare`, `setns`, `bpf`, `keyctl`, `io_uring_setup`, `perf_event_open`,
+   `userfaultfd`, `personality`, `process_vm_readv`, `init_module`, `kexec_load`, `reboot`, `chroot`,
+   `clone(CLONE_NEWUSER)` and raw sockets are refused, `clone3` gives ENOSYS, fork and normal sockets
+   work. The same script under Docker's default profile passes 38/47: 9 syscalls still reach the
+   kernel there (`personality`, `process_vm_readv`, `modify_ldt`, `mknod`, `capset`, `mlockall`,
+   `name_to_handle_at`, an `AF_ALG` socket is *created*, `AF_KEY`). With all capabilities dropped most
+   of those fail later in the kernel, so the practical gain is defence in depth, not a new wall.
+
+**Honest limitations.**
+- The profile is only as complete as the workload. A tool path the suite never exercised may hit
+  EPERM. Mitigation: the 92-name margin, and `SCMP_ACT_LOG` mode, which logs instead of blocking.
+- `ioctl` is allowed unconditionally (the NVIDIA driver uses a very large ioctl surface), and `ioctl`
+  arguments cannot be safely denied by value from seccomp. `TIOCSTI` is blocked by the kernel instead
+  (`dev.tty.legacy_tiocsti=0`, default on recent kernels).
+- Things the sandbox no longer does: change uid/gid (`setuid`, `capset`), create namespaces (so
+  Chromium's own sandbox and `bwrap` will not start; use `--no-sandbox` inside the already-contained
+  container), use `io_uring`.
+- The margin names are not backed by trace evidence; they are labelled as such in the code.
+- Seccomp narrows the kernel attack surface. It does not stop `rm -rf /workspace`; that is what
+  the mount scoping, `approvals.deny` and checkpoints above are for.
+
+**Enable it** (Hermes `config.yaml`, then let the sandbox container be recreated):
+```yaml
+terminal:
+  docker_extra_args:
+    - --security-opt=seccomp=/absolute/path/to/seccomp-hermes.json
+```
+Roll back by removing that line and recreating the container. To debug a suspected gap, first
+try the log-mode variant (change `defaultAction` to `SCMP_ACT_LOG`) and read `dmesg | grep 1326`.
+
 ## How to apply this yourself
 
 See [`diagrams/11_howto_setup`](diagrams/11_howto_setup.svg) for the full flow. Short version:
@@ -441,6 +522,12 @@ diagrams/
     02_stale_sys_modules_mechanism.{dot,svg,png}
     03_existing_mitigation_gap.{dot,svg,png}
     04_verified_non_blocking.{dot,svg,png}
+  17_addendum_seccomp/
+    01_method_overview.{dot,svg,png}
+    02_allowlist_composition.{dot,svg,png}
+    03_argument_filters.{dot,svg,png}
+    04_validation_results.{dot,svg,png}
+docker/hermes-sandbox-seccomp/       # profile, builder, workload, negative tests, evidence
 docker/hermes-sandbox-graphviz/Dockerfile   # the validated derived-image recipe (Graphviz example)
 .github/workflows/verify-diagrams.yml   # re-renders every .dot on push, diffs against committed SVG
 ```

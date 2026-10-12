@@ -1,0 +1,20 @@
+digraph Method {
+  rankdir=LR;
+  label="Measure, don't guess: from a scripted workload to a default-deny profile";
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+  suite [fillcolor="#1a1f26", color="#556070", label="run_suite.sh\n40 steps via docker exec\n(shell, git, python, torch+GPU, nim,\nffmpeg, OCR, curl, tmux, ...)"];
+  ctr [fillcolor="#152a3a", color="#39d0ff", label="throwaway container\nsame flags as live sandbox\nseccomp=unconfined\n(tracing only)"];
+  perf [fillcolor="#152a3a", color="#39d0ff", label="sudo perf trace -a\n-G <container cgroup>\nevery syscall, every process\nno ptrace, no attach race"];
+  ext [fillcolor="#1a1f26", color="#556070", label="extract_syscalls.py\ndrops runc-init (pre-filter)\n146 distinct syscalls"];
+  build [fillcolor="#2a2410", color="#ffa93a", label="build_profile.py\n+ 1 runtime (openat2)\n+ 92 labelled margin\n- 4 observed-but-denied\n+ arg filters"];
+  prof [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5, label="seccomp-hermes.json\nSCMP_ACT_ERRNO default\n235 syscall names"];
+  val [fillcolor="#0f2a20", color="#39ffb0", label="validate\nenforce 40/40\nLOG-mode audit clean\nnegative tests 47/47"];
+  suite -> ctr -> perf -> ext -> build -> prof -> val;
+  val -> build [style=dashed, color="#ff4d4d", label="gap found?\nadd + re-run"];
+}

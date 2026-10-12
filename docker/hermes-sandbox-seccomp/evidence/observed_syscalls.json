@@ -1,0 +1,1292 @@
+{
+ "syscalls": {
+  "accept": {
+   "count": 5,
+   "example_processes": [
+    "server"
+   ]
+  },
+  "accept4": {
+   "count": 1,
+   "example_processes": [
+    "python3"
+   ]
+  },
+  "access": {
+   "count": 3785,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "arch_prctl": {
+   "count": 487,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "bind": {
+   "count": 17,
+   "example_processes": [
+    "curl",
+    "pip",
+    "python3",
+    "server",
+    "wget"
+   ]
+  },
+  "brk": {
+   "count": 7490,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "capget": {
+   "count": 24,
+   "example_processes": [
+    "node"
+   ]
+  },
+  "chdir": {
+   "count": 59,
+   "example_processes": [
+    "bash",
+    "git",
+    "make",
+    "mkdir",
+    "python3",
+    "server"
+   ]
+  },
+  "chmod": {
+   "count": 48,
+   "example_processes": [
+    "fontco",
+    "git",
+    "ld",
+    "python3",
+    "server",
+    "zip"
+   ]
+  },
+  "clock_gettime": {
+   "count": 16,
+   "example_processes": [
+    "pandoc"
+   ]
+  },
+  "clock_nanosleep": {
+   "count": 159,
+   "example_processes": [
+    "nvidia-smi",
+    "python3",
+    "rg",
+    "rsync",
+    "sleep"
+   ]
+  },
+  "clone": {
+   "count": 719,
+   "example_processes": [
+    "bash",
+    "client",
+    "git",
+    "nim",
+    "python3",
+    "rsync"
+   ]
+  },
+  "clone3": {
+   "count": 964,
+   "example_processes": [
+    "af#0:1",
+    "collect2",
+    "cuda0000180000",
+    "curl",
+    "dot",
+    "ffmpeg"
+   ]
+  },
+  "close": {
+   "count": 32616,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "close_range": {
+   "count": 52,
+   "example_processes": [
+    "ocrmypdf",
+    "python3",
+    "server",
+    "ssh"
+   ]
+  },
+  "connect": {
+   "count": 395,
+   "example_processes": [
+    "bash",
+    "client",
+    "curl",
+    "getent",
+    "id",
+    "ls"
+   ]
+  },
+  "copy_file_range": {
+   "count": 8,
+   "example_processes": [
+    "cp"
+   ]
+  },
+  "creat": {
+   "count": 4,
+   "example_processes": [
+    "tar"
+   ]
+  },
+  "dup": {
+   "count": 48,
+   "example_processes": [
+    "client",
+    "fallocate",
+    "git",
+    "python3"
+   ]
+  },
+  "dup2": {
+   "count": 314,
+   "example_processes": [
+    "bash",
+    "client",
+    "dd",
+    "nim",
+    "ocrmypdf",
+    "python3"
+   ]
+  },
+  "epoll_create": {
+   "count": 5,
+   "example_processes": [
+    "pandoc",
+    "pkill"
+   ]
+  },
+  "epoll_create1": {
+   "count": 27,
+   "example_processes": [
+    "node",
+    "ocrmypdf",
+    "pip",
+    "python3"
+   ]
+  },
+  "epoll_ctl": {
+   "count": 28,
+   "example_processes": [
+    "node",
+    "pandoc",
+    "python3"
+   ]
+  },
+  "epoll_pwait": {
+   "count": 10,
+   "example_processes": [
+    "node"
+   ]
+  },
+  "epoll_wait": {
+   "count": 32,
+   "example_processes": [
+    "ghc_worker",
+    "python3"
+   ]
+  },
+  "eventfd2": {
+   "count": 39,
+   "example_processes": [
+    "curl",
+    "node",
+    "nvidia-smi",
+    "pandoc",
+    "python3"
+   ]
+  },
+  "execve": {
+   "count": 952,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "exit": {
+   "count": 381,
+   "example_processes": [
+    "af#0:1",
+    "curl",
+    "dec0:0:wrapped",
+    "dec1:0:pcm_s16",
+    "dmx0:lavfi",
+    "dmx1:lavfi"
+   ]
+  },
+  "exit_group": {
+   "count": 455,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "faccessat2": {
+   "count": 26,
+   "example_processes": [
+    "bash",
+    "cc1",
+    "gcc",
+    "ld",
+    "tmux"
+   ]
+  },
+  "fadvise64": {
+   "count": 91,
+   "example_processes": [
+    "base64",
+    "cat",
+    "convert",
+    "cp",
+    "dot",
+    "fontco"
+   ]
+  },
+  "fallocate": {
+   "count": 2,
+   "example_processes": [
+    "fallocate"
+   ]
+  },
+  "fchdir": {
+   "count": 4,
+   "example_processes": [
+    "find",
+    "rsync"
+   ]
+  },
+  "fchmod": {
+   "count": 4,
+   "example_processes": [
+    "gzip",
+    "rsync"
+   ]
+  },
+  "fchmodat": {
+   "count": 2,
+   "example_processes": [
+    "chmod"
+   ]
+  },
+  "fchown": {
+   "count": 4,
+   "example_processes": [
+    "gzip"
+   ]
+  },
+  "fcntl": {
+   "count": 4604,
+   "example_processes": [
+    "as",
+    "bash",
+    "client",
+    "convert",
+    "curl",
+    "df"
+   ]
+  },
+  "fdatasync": {
+   "count": 16,
+   "example_processes": [
+    "sqlite3"
+   ]
+  },
+  "flock": {
+   "count": 2,
+   "example_processes": [
+    "client"
+   ]
+  },
+  "fstat": {
+   "count": 36065,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "fstatfs": {
+   "count": 384,
+   "example_processes": [
+    "convert",
+    "dot",
+    "du",
+    "find",
+    "fontco",
+    "grep"
+   ]
+  },
+  "fsync": {
+   "count": 10,
+   "example_processes": [
+    "fallocate",
+    "python3"
+   ]
+  },
+  "ftruncate": {
+   "count": 4,
+   "example_processes": [
+    "pandoc",
+    "truncate"
+   ]
+  },
+  "futex": {
+   "count": 10576,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "cat"
+   ]
+  },
+  "get_mempolicy": {
+   "count": 8,
+   "example_processes": [
+    "nvidia-smi",
+    "python3"
+   ]
+  },
+  "getcwd": {
+   "count": 1995,
+   "example_processes": [
+    "bash",
+    "cc1",
+    "client",
+    "convert",
+    "df",
+    "dot"
+   ]
+  },
+  "getdents64": {
+   "count": 3617,
+   "example_processes": [
+    "bash",
+    "client",
+    "convert",
+    "dot",
+    "dpkg",
+    "dpkg-query"
+   ]
+  },
+  "getegid": {
+   "count": 865,
+   "example_processes": [
+    "bash",
+    "gunzip",
+    "id",
+    "make",
+    "nim",
+    "node"
+   ]
+  },
+  "geteuid": {
+   "count": 976,
+   "example_processes": [
+    "bash",
+    "cp",
+    "curl",
+    "git",
+    "gunzip",
+    "id"
+   ]
+  },
+  "getgid": {
+   "count": 855,
+   "example_processes": [
+    "bash",
+    "gunzip",
+    "id",
+    "make",
+    "nim",
+    "node"
+   ]
+  },
+  "getgroups": {
+   "count": 10,
+   "example_processes": [
+    "id",
+    "rsync",
+    "wget"
+   ]
+  },
+  "getpeername": {
+   "count": 82,
+   "example_processes": [
+    "bash",
+    "python3"
+   ]
+  },
+  "getpgrp": {
+   "count": 77,
+   "example_processes": [
+    "bash",
+    "setsid"
+   ]
+  },
+  "getpid": {
+   "count": 1138,
+   "example_processes": [
+    "bash",
+    "client",
+    "convert",
+    "curl",
+    "dot",
+    "ffmpeg"
+   ]
+  },
+  "getppid": {
+   "count": 264,
+   "example_processes": [
+    "bash",
+    "gunzip",
+    "nim",
+    "sh"
+   ]
+  },
+  "getpriority": {
+   "count": 4,
+   "example_processes": [
+    "ocrmypdf"
+   ]
+  },
+  "getrandom": {
+   "count": 1242,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "getrusage": {
+   "count": 13,
+   "example_processes": [
+    "as",
+    "ffmpeg",
+    "ld"
+   ]
+  },
+  "getsockname": {
+   "count": 52,
+   "example_processes": [
+    "curl",
+    "python3",
+    "wget"
+   ]
+  },
+  "getsockopt": {
+   "count": 20,
+   "example_processes": [
+    "client",
+    "curl",
+    "python3",
+    "server"
+   ]
+  },
+  "gettid": {
+   "count": 146,
+   "example_processes": [
+    "cuda0000180000",
+    "dot",
+    "fontco",
+    "node",
+    "nvidia-smi",
+    "ocrmypdf"
+   ]
+  },
+  "getuid": {
+   "count": 922,
+   "example_processes": [
+    "bash",
+    "dpkg",
+    "gunzip",
+    "id",
+    "make",
+    "nim"
+   ]
+  },
+  "ioctl": {
+   "count": 15262,
+   "example_processes": [
+    "awk",
+    "bash",
+    "cc1",
+    "client",
+    "collect2",
+    "cp"
+   ]
+  },
+  "kill": {
+   "count": 19,
+   "example_processes": [
+    "bash",
+    "pkill",
+    "python3",
+    "rsync",
+    "server",
+    "timeout"
+   ]
+  },
+  "landlock_create_ruleset": {
+   "count": 24,
+   "example_processes": [
+    "xz"
+   ]
+  },
+  "landlock_restrict_self": {
+   "count": 14,
+   "example_processes": [
+    "xz"
+   ]
+  },
+  "link": {
+   "count": 22,
+   "example_processes": [
+    "fontco",
+    "git",
+    "python3"
+   ]
+  },
+  "listen": {
+   "count": 7,
+   "example_processes": [
+    "python3",
+    "server"
+   ]
+  },
+  "llistxattr": {
+   "count": 18,
+   "example_processes": [
+    "ls"
+   ]
+  },
+  "lseek": {
+   "count": 31471,
+   "example_processes": [
+    "as",
+    "base64",
+    "bash",
+    "convert",
+    "cp",
+    "curl"
+   ]
+  },
+  "lstat": {
+   "count": 4,
+   "example_processes": [
+    "nim"
+   ]
+  },
+  "madvise": {
+   "count": 591,
+   "example_processes": [
+    "af#0:1",
+    "curl",
+    "dec0:0:wrapped",
+    "dec1:0:pcm_s16",
+    "dmx0:lavfi",
+    "dmx1:lavfi"
+   ]
+  },
+  "mbind": {
+   "count": 128,
+   "example_processes": [
+    "python3"
+   ]
+  },
+  "mkdir": {
+   "count": 4405,
+   "example_processes": [
+    "fontco",
+    "git",
+    "mkdir",
+    "nim",
+    "ocrmypdf",
+    "python3"
+   ]
+  },
+  "mmap": {
+   "count": 34082,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c"
+   ]
+  },
+  "mprotect": {
+   "count": 7459,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c"
+   ]
+  },
+  "mremap": {
+   "count": 14,
+   "example_processes": [
+    "convert",
+    "python3"
+   ]
+  },
+  "munmap": {
+   "count": 7451,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c"
+   ]
+  },
+  "newfstatat": {
+   "count": 75686,
+   "example_processes": [
+    "as",
+    "bash",
+    "cc1",
+    "chmod",
+    "collect2",
+    "convert"
+   ]
+  },
+  "open": {
+   "count": 841,
+   "example_processes": [
+    "nim",
+    "nimble",
+    "ocrmypdf",
+    "python3",
+    "tmux"
+   ]
+  },
+  "openat": {
+   "count": 38999,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "pipe": {
+   "count": 6,
+   "example_processes": [
+    "nim"
+   ]
+  },
+  "pipe2": {
+   "count": 245,
+   "example_processes": [
+    "bash",
+    "client",
+    "git",
+    "nim",
+    "node",
+    "nvidia-smi"
+   ]
+  },
+  "pkey_alloc": {
+   "count": 2,
+   "example_processes": [
+    "node"
+   ]
+  },
+  "poll": {
+   "count": 482,
+   "example_processes": [
+    "client",
+    "cuda-EvtHandlr",
+    "cuda0000140000",
+    "cuda0000180000",
+    "curl",
+    "getent"
+   ]
+  },
+  "prctl": {
+   "count": 282,
+   "example_processes": [
+    "af#0:1",
+    "client",
+    "dec0:0:wrapped",
+    "dec1:0:pcm_s16",
+    "dmx0:lavfi",
+    "dmx1:lavfi"
+   ]
+  },
+  "pread64": {
+   "count": 1217,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "prlimit64": {
+   "count": 747,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "pselect6": {
+   "count": 10,
+   "example_processes": [
+    "wget"
+   ]
+  },
+  "pwrite64": {
+   "count": 356,
+   "example_processes": [
+    "gs",
+    "sqlite3"
+   ]
+  },
+  "read": {
+   "count": 32245,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "readlink": {
+   "count": 10272,
+   "example_processes": [
+    "cc1",
+    "client",
+    "convert",
+    "dot",
+    "dpkg-query",
+    "fontco"
+   ]
+  },
+  "readlinkat": {
+   "count": 26,
+   "example_processes": [
+    "ldconfig",
+    "pip",
+    "python",
+    "python3"
+   ]
+  },
+  "readv": {
+   "count": 3556,
+   "example_processes": [
+    "nim",
+    "nimble"
+   ]
+  },
+  "recvfrom": {
+   "count": 107,
+   "example_processes": [
+    "curl",
+    "getent",
+    "python3",
+    "ssh",
+    "wget"
+   ]
+  },
+  "recvmsg": {
+   "count": 53,
+   "example_processes": [
+    "client",
+    "curl",
+    "python3",
+    "server",
+    "wget"
+   ]
+  },
+  "rename": {
+   "count": 1748,
+   "example_processes": [
+    "fontco",
+    "git",
+    "ocrmypdf",
+    "python3",
+    "zip"
+   ]
+  },
+  "renameat": {
+   "count": 1,
+   "example_processes": [
+    "rsync"
+   ]
+  },
+  "renameat2": {
+   "count": 2,
+   "example_processes": [
+    "mv"
+   ]
+  },
+  "rmdir": {
+   "count": 16,
+   "example_processes": [
+    "nimble",
+    "ocrmypdf",
+    "python3"
+   ]
+  },
+  "rseq": {
+   "count": 857,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c"
+   ]
+  },
+  "rt_sigaction": {
+   "count": 7255,
+   "example_processes": [
+    "as",
+    "bash",
+    "cc1",
+    "client",
+    "collect2",
+    "convert"
+   ]
+  },
+  "rt_sigprocmask": {
+   "count": 5573,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "bash",
+    "cc1",
+    "client",
+    "collect2"
+   ]
+  },
+  "rt_sigreturn": {
+   "count": 224,
+   "example_processes": [
+    "bash",
+    "client",
+    "nim",
+    "python3",
+    "rsync",
+    "server"
+   ]
+  },
+  "rt_sigsuspend": {
+   "count": 3,
+   "example_processes": [
+    "timeout"
+   ]
+  },
+  "rt_sigtimedwait": {
+   "count": 51,
+   "example_processes": [
+    "docker-init"
+   ]
+  },
+  "sched_get_priority_max": {
+   "count": 16,
+   "example_processes": [
+    "nvidia-smi",
+    "python3"
+   ]
+  },
+  "sched_get_priority_min": {
+   "count": 16,
+   "example_processes": [
+    "nvidia-smi",
+    "python3"
+   ]
+  },
+  "sched_getaffinity": {
+   "count": 121,
+   "example_processes": [
+    "af#0:1",
+    "convert",
+    "ffmpeg",
+    "ffprobe",
+    "ghc_worker",
+    "nim"
+   ]
+  },
+  "sched_setaffinity": {
+   "count": 68,
+   "example_processes": [
+    "python3"
+   ]
+  },
+  "sched_yield": {
+   "count": 84,
+   "example_processes": [
+    "pandoc"
+   ]
+  },
+  "sendmmsg": {
+   "count": 10,
+   "example_processes": [
+    "curl",
+    "python3",
+    "ssh",
+    "wget"
+   ]
+  },
+  "sendmsg": {
+   "count": 43,
+   "example_processes": [
+    "client",
+    "server",
+    "wget"
+   ]
+  },
+  "sendto": {
+   "count": 27,
+   "example_processes": [
+    "curl",
+    "getent",
+    "python3",
+    "wget"
+   ]
+  },
+  "set_robust_list": {
+   "count": 1129,
+   "example_processes": [
+    "af#0:1",
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c"
+   ]
+  },
+  "set_tid_address": {
+   "count": 492,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "setitimer": {
+   "count": 8,
+   "example_processes": [
+    "wget"
+   ]
+  },
+  "setpgid": {
+   "count": 1,
+   "example_processes": [
+    "timeout"
+   ]
+  },
+  "setpriority": {
+   "count": 2,
+   "example_processes": [
+    "ocrmypdf"
+   ]
+  },
+  "setsid": {
+   "count": 14,
+   "example_processes": [
+    "client",
+    "git",
+    "python3",
+    "server",
+    "setsid"
+   ]
+  },
+  "setsockopt": {
+   "count": 53,
+   "example_processes": [
+    "curl",
+    "getent",
+    "python3",
+    "ssh",
+    "wget"
+   ]
+  },
+  "shutdown": {
+   "count": 1,
+   "example_processes": [
+    "python3"
+   ]
+  },
+  "sigaltstack": {
+   "count": 80,
+   "example_processes": [
+    "diff",
+    "grep",
+    "rg"
+   ]
+  },
+  "socket": {
+   "count": 383,
+   "example_processes": [
+    "bash",
+    "client",
+    "curl",
+    "getent",
+    "id",
+    "ls"
+   ]
+  },
+  "socketpair": {
+   "count": 12,
+   "example_processes": [
+    "client",
+    "python3",
+    "rsync"
+   ]
+  },
+  "stat": {
+   "count": 4164,
+   "example_processes": [
+    "nim",
+    "nimble",
+    "nvidia-smi",
+    "python3"
+   ]
+  },
+  "statfs": {
+   "count": 124,
+   "example_processes": [
+    "cp",
+    "df",
+    "dot",
+    "dpkg",
+    "dpkg-query",
+    "ffmpeg"
+   ]
+  },
+  "statx": {
+   "count": 91,
+   "example_processes": [
+    "ls",
+    "rg",
+    "stat"
+   ]
+  },
+  "symlink": {
+   "count": 80,
+   "example_processes": [
+    "git",
+    "nvidia-smi",
+    "ocrmypdf",
+    "python3"
+   ]
+  },
+  "symlinkat": {
+   "count": 2,
+   "example_processes": [
+    "ln"
+   ]
+  },
+  "sync": {
+   "count": 2,
+   "example_processes": [
+    "sync"
+   ]
+  },
+  "sysinfo": {
+   "count": 38,
+   "example_processes": [
+    "cc1",
+    "convert",
+    "gcc",
+    "pandoc",
+    "python3",
+    "sort"
+   ]
+  },
+  "timer_create": {
+   "count": 1,
+   "example_processes": [
+    "timeout"
+   ]
+  },
+  "timer_settime": {
+   "count": 1,
+   "example_processes": [
+    "timeout"
+   ]
+  },
+  "timerfd_create": {
+   "count": 4,
+   "example_processes": [
+    "pandoc"
+   ]
+  },
+  "timerfd_settime": {
+   "count": 4,
+   "example_processes": [
+    "pandoc"
+   ]
+  },
+  "times": {
+   "count": 8,
+   "example_processes": [
+    "convert"
+   ]
+  },
+  "umask": {
+   "count": 47,
+   "example_processes": [
+    "chmod",
+    "dpkg",
+    "dpkg-query",
+    "ld",
+    "mkdir",
+    "python3"
+   ]
+  },
+  "uname": {
+   "count": 174,
+   "example_processes": [
+    "bash",
+    "client",
+    "cp",
+    "df",
+    "find",
+    "hostname"
+   ]
+  },
+  "unlink": {
+   "count": 238,
+   "example_processes": [
+    "client",
+    "collect2",
+    "fontco",
+    "gcc",
+    "git",
+    "gs"
+   ]
+  },
+  "unlinkat": {
+   "count": 4494,
+   "example_processes": [
+    "ocrmypdf",
+    "python3",
+    "rm",
+    "tar"
+   ]
+  },
+  "utimensat": {
+   "count": 9,
+   "example_processes": [
+    "gzip",
+    "rsync",
+    "tar",
+    "touch"
+   ]
+  },
+  "vfork": {
+   "count": 116,
+   "example_processes": [
+    "gcc",
+    "nim",
+    "ocrmypdf",
+    "python3",
+    "sh"
+   ]
+  },
+  "wait4": {
+   "count": 987,
+   "example_processes": [
+    "bash",
+    "client",
+    "collect2",
+    "docker-init",
+    "gcc",
+    "git"
+   ]
+  },
+  "write": {
+   "count": 5402,
+   "example_processes": [
+    "as",
+    "awk",
+    "base64",
+    "bash",
+    "c",
+    "cat"
+   ]
+  },
+  "writev": {
+   "count": 17,
+   "example_processes": [
+    "client",
+    "nim",
+    "nimble"
+   ]
+  }
+ }
+}

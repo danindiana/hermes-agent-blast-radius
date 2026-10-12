@@ -1,0 +1,17 @@
+digraph Validation {
+  rankdir=TB;
+  label="Validation: enforced, audited, and attacked";
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+  a [fillcolor="#0f2a20", color="#39ffb0", label="ENFORCED (SCMP_ACT_ERRNO)\nfull suite: 40 / 40 steps pass\nincl. torch on GPU, ffmpeg, nim, OCR, git, curl"];
+  b [fillcolor="#152a3a", color="#39d0ff", label="LOG MODE (SCMP_ACT_LOG + kernel audit)\nsame suite: 10 audit records, all from xz\nprobing landlock (denied on purpose, xz carries on)\n— no other syscall outside the allowlist"];
+  c [fillcolor="#0f2a20", color="#39ffb0", penwidth=2.5, label="NEGATIVE TESTS under the new profile\n47 / 47 pass: ptrace, mount, unshare, bpf, keyctl,\nio_uring, perf_event_open, userfaultfd, personality,\nprocess_vm_readv, AF_ALG ... all refused"];
+  d [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="SAME tests under Docker's default profile\n38 / 47: 9 still reachable\npersonality, process_vm_readv, modify_ldt,\nmknod, capset, mlockall, name_to_handle_at,\nAF_ALG socket CREATED, AF_KEY"];
+  a -> b -> c;
+  c -> d [style=dashed, label="what the allowlist buys"];
+}

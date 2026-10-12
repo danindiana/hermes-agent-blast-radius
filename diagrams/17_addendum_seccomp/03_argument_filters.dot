@@ -1,0 +1,25 @@
+digraph ArgFilters {
+  rankdir=LR;
+  label="Three argument filters do more than the name list";
+  bgcolor="#0a0e12";
+  fontname="Helvetica";
+  fontcolor="#dfe6ee";
+  labelloc="t";
+  fontsize=16;
+  node [style=filled, fontname="Helvetica", fontcolor="#dfe6ee", shape=box, penwidth=1.5];
+  edge [color="#556070", fontcolor="#ffa93a", fontname="Helvetica"];
+  clone [fillcolor="#152a3a", color="#39d0ff", label="clone(flags)"];
+  mask [shape=diamond, fillcolor="#2a2410", color="#ffa93a", label="flags & 0x7E020000 == 0 ?\n(NEWNS NEWCGROUP NEWUTS\nNEWIPC NEWUSER NEWPID NEWNET)"];
+  cok [fillcolor="#0f2a20", color="#39ffb0", label="allowed: threads, fork"];
+  cno [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="EPERM: no new namespaces\n(rootless userns escape primitive)"];
+  clone -> mask; mask -> cok [label="yes"]; mask -> cno [label="no"];
+  c3 [fillcolor="#152a3a", color="#39d0ff", label="clone3(struct*)"];
+  enos [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="ENOSYS\nflags hide in a struct seccomp cannot read"];
+  fb [fillcolor="#0f2a20", color="#39ffb0", label="glibc falls back to clone()\n-> filtered by the rule above\n(501 clone3 calls in one trace: all fine)"];
+  c3 -> enos -> fb;
+  sock [fillcolor="#152a3a", color="#39d0ff", label="socket(family)"];
+  fam [shape=diamond, fillcolor="#2a2410", color="#ffa93a", label="family in\nAF_UNIX, AF_INET,\nAF_INET6, AF_NETLINK ?"];
+  sok [fillcolor="#0f2a20", color="#39ffb0", label="allowed (only families seen in trace)"];
+  sno [fillcolor="#4a0808", color="#ff4d4d", fontcolor="#fff0f0", label="EPERM: AF_PACKET, AF_ALG,\nAF_VSOCK, AF_KEY, ..."];
+  sock -> fam; fam -> sok [label="yes"]; fam -> sno [label="no"];
+}
