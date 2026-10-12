@@ -456,6 +456,11 @@ Three things the name list alone cannot do:
 - Seccomp narrows the kernel attack surface. It does not stop `rm -rf /workspace`; that is what
   the mount scoping, `approvals.deny` and checkpoints above are for.
 
+**Status on the author's system:** active since 2026-10-12. After recreating the live sandbox container, the
+full suite (40/40) and the negative tests (47/47) were re-run against it with `docker exec`, and a real
+Hermes tool call (GPU listing, Python, git, a write to `/workspace`) worked. The kernel audit log
+showed only the expected `xz` landlock refusals and the negative tests' own probes.
+
 **Enable it** (Hermes `config.yaml`, then let the sandbox container be recreated):
 ```yaml
 terminal:
